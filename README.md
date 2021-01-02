@@ -24,4 +24,4 @@ The achievement of the goal listed above proceeded in phases, for each of which 
 - `lawn_mower_path.ipynb`: definition of a region and its lawn; simulation of one mowing operation  
 - `lawn_mower_coverage.ipynb`: perform repeated operations, updating and recording the mown lawn after each  
 
-![one operation](https://github.com/achiappo/Simulator/blob/master/media/download.gif)
+![one operation](https://github.com/achiappo/Simulator/blob/master/media/mower.gif)
