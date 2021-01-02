@@ -12,9 +12,13 @@ advancing straight. When low on battery, each unit will stop mowing, proceed unt
 and follow it back to the first available recharging station encountered.  
 Operation cycles last for about 1 hour, during which the two units clearly cannot mow the entire lawn, but  
 only a fraction thereof. This aspect results from the chaotic motion of the machines, implying that each unit  
-might pass repeated times over the same patch of grass. 
+might pass repeated times over the same patch of grass.
 
 ### Objectives
 - Build the infrastructure to simulate two mowers moving randomly over some user-defined area
 - Determine the average number of operations needed to mow most of the lawn, given two random initial positions  
 - Determine the initial mowers' locations which minimise the number of operations to mow the entire lawn
+
+### Repository organisation
+The achievement of the goal listed above proceeded in phases, for each of which there is a notebook associated
+- `lawn_mower_path.ipynb`: definition of a region and its lawn; simulation of one mowing operation by the mowers
