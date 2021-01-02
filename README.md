@@ -23,3 +23,5 @@ might pass repeated times over the same patch of grass.
 The achievement of the goal listed above proceeded in phases, for each of which there is a notebook associated
 - `lawn_mower_path.ipynb`: definition of a region and its lawn; simulation of one mowing operation  
 - `lawn_mower_coverage.ipynb`: perform repeated operations, updating and recording the mown lawn after each  
+
+![Two lawn mowers, one operation](https://github.com/achiappo/Simulator/blob/master/media/download.mp4)
