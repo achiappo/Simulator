@@ -15,5 +15,6 @@ only a fraction thereof. This aspect results from the chaotic motion of the mach
 might pass repeated times over the same patch of grass. 
 
 ### Objectives
-The aim of this project is to build the infrastructure to simulate two mowers moving randomly over some user-defined area.  
-Given a lawn and the random nature of the mowers' motion, using this tool it's possible to determine the average number of  
+- Build the infrastructure to simulate two mowers moving randomly over some user-defined area
+- Determine the average number of operations needed to mow most (>99%) of the lawn, given two random initial positions  
+- Determine the initial mowers' locations which minimise the number of operations to mow the entire lawn
