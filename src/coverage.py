@@ -74,6 +74,7 @@ class Coverage(Simulator):
             if verbose:
                 print(f"starting iteration {self.iteration}")
                 print("simulate mowers")
+            
             self.simulate(restart=True)
 
             if first_execution:
@@ -89,5 +90,6 @@ class Coverage(Simulator):
             
             if verbose:
                 print(f"end of iteration {self.iteration}, ratio {self.mown_area_ratio}")
+
             self.iteration += 1
 

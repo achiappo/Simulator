@@ -6,6 +6,11 @@ import numpy as np
 
 
 def find_random_point_on_polygon(obj_x_loc, obj_y_loc):
+    """
+    Given a polygon, identified by the coordinates of its vertices 
+    return a random point on the polygon
+    """
+    
     #get number of vertices
     n = len(obj_x_loc)
     
