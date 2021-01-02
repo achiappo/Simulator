@@ -16,5 +16,5 @@ might pass repeated times over the same patch of grass.
 
 ### Objectives
 - Build the infrastructure to simulate two mowers moving randomly over some user-defined area
-- Determine the average number of operations needed to mow most (>99%) of the lawn, given two random initial positions  
+- Determine the average number of operations needed to mow most of the lawn, given two random initial positions  
 - Determine the initial mowers' locations which minimise the number of operations to mow the entire lawn
