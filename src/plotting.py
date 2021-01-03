@@ -14,6 +14,21 @@ from shapely.geometry.polygon import Polygon
 
 
 def get_lawn_region_plot(lawn_points, region_points):
+    """
+    plot the lawn area on top of the entire region
+
+    parameters:
+    - lawn_points : list of lists of tuples
+        list of list of two tuples, consisting of the endpoints 
+        of segments corresponding to lawn
+    - region_points : list of lists of tuples
+        list of list of two tuples, consisting of the endpoints 
+        of segments corresponding to whole region
+
+    returns:
+    - fig: matplotlib.figure object
+    - ax: matplotlib.axes object
+    """
 
     fig, ax = mplt.subplots(figsize=(12,8))
 
@@ -53,6 +68,22 @@ def get_lawn_region_plot(lawn_points, region_points):
     return fig, ax
 
 def get_mowers_animation(ax, fig, path0, path1, interval=2):
+    """
+    build an animation from the cumulative path of two lawn mowers
+    corresponding to one operation cycle
+
+    parameters:
+    - ax: matplotlib.axes object
+        axes on which to plot the animation
+    - fig: matplotlib.figure object
+    - path0: global path of unit0
+    - path1: global path of unit1
+    - interval: interval between one frame and the next one 
+        in the animation (default=2)
+
+    returns:
+    - animation: matplotlib.animation object
+    """
 
     ax.plot(*path0[0], 'C3o', ms=8, zorder=10);
     ax.plot(*path1[0], 'C2o', ms=8, zorder=10);

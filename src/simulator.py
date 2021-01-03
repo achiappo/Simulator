@@ -12,6 +12,10 @@ from shapely.geometry.polygon import Polygon
 
 
 class Base(object):
+    """
+    simulator base class
+    """
+
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
         self.theta_max = kwargs['theta_max']
@@ -22,6 +26,11 @@ class Base(object):
         self._build_polygons()
     
     def _build_polygons(self):
+        """
+        Given the points determining the region and the lawn within it
+        build the corresponding shapely.geometry.polygon objects
+        """
+
         region_perimeter = np.array(self.region_points).reshape(-1,2)[::2]
         region_perimeter = np.vstack((region_perimeter, region_perimeter[0]))
         self.region_polygon = Polygon(region_perimeter)
@@ -31,27 +40,57 @@ class Base(object):
         self.lawn_polygon = Polygon(lawn_perimeter)
 
     def find_initial_position(self):
+        """
+        Starting from the lawn polygon object, calculate a random position 
+        along it and return its coordinates
+        """
+
         x_verts, y_verts = np.array(self.lawn_polygon.boundary.coords).T
         pos = util.find_random_point_on_polygon(x_verts, y_verts)
         return pos
 
     def _new_direction(self):
+        """
+        Given the minimum and maximum steering angles, return a new 
+        direction between the two
+        """
+
         a = self.theta_min
         b = self.theta_max
         return np.random.rand() * (b-a) + a
 
-    def _calculate_autonomy(self):
+    def _calculate_max_steps(self):
+        """
+        Given the autonomy of each machine, its velocity, the 
+        scale of the lawn (with respect to some realistic value)
+        and the step size, return the maximum number of steps 
+        feasible by each machine.
+
+        returns: int
+        """
+
         max_real_distance = self.velocity * self.autonomy
         max_perimeter_len = max(self.lawn_polygon.bounds)
         size_ratio = max_perimeter_len / self.real_perimeter_size
         return round(max_real_distance * size_ratio / self.step)
     
     def _inside_perimeter(self, x, y):
+        """
+        Use shapely.geometry.polygon feature to determine if a 
+        given point lies within a polygon's perimeter
+
+        returns: bool
+        """
+
         point = Point(x, y)
         return self.lawn_polygon.contains(point)
 
 
 class Simulator(Base):
+    """
+    Simulator class
+    """
+
     def __init__(self, **kwargs):
         super(Simulator, self).__init__(**kwargs)
         
@@ -64,7 +103,7 @@ class Simulator(Base):
         self.max_stretch_len = kwargs['max_len'] if 'max_len' in kwargs else 16
         self.find_mown_area = kwargs['coverage'] if 'coverage' in kwargs else None
 
-        self.max_n_steps = self._calculate_autonomy()
+        self.max_n_steps = self._calculate_max_steps()
         
         self.stop_unit0 = False
         self.stop_unit1 = False
@@ -80,7 +119,18 @@ class Simulator(Base):
             exec(f"self.dir_unit{u} = self._initial_direction(*pos0)")
         
     def _initial_direction(self, x0, y0):
-        # find initial direction of a unit
+        """
+        Given a position, find the initial direction of a unit
+
+        parameters:
+        - x0,y0: float, float
+            initial x and y coordinates of a machine
+
+        returns:
+         - initial_direction: float
+             angles of the initial direction of movement
+        """ 
+
         found = False
         while not found:
             initial_direction = self._new_direction()
@@ -89,11 +139,21 @@ class Simulator(Base):
             ynew = y0 + y
             if self._inside_perimeter(xnew, ynew):
                 found = True
+
         return initial_direction
     
     def _bump(self):
-        # 0.15 : unit scale size 
-        # scale 80cm (~unit size) / 80m (~lawn width)
+        """
+        establish if the two units bumped into each other
+        by determining if their distance is smaller than 
+        the individual unit size
+        
+        0.15 : unit scale size 
+        scale 80cm (~unit size) / 80m (~lawn width)
+
+        returns: bool
+        """
+
         pos_unit0 = np.array(self.pos_unit0)
         pos_unit1 = np.array(self.pos_unit1)
         unit_distance = np.linalg.norm(pos_unit0 - pos_unit1)
@@ -102,12 +162,31 @@ class Simulator(Base):
         else:
             return False
     
-    def _new_step(self, t, direction):
-        x = np.cos(direction) * t
-        y = np.sin(direction) * t
+    def _new_step(self, distance, direction):
+        """
+        Advance a unit along its direction of movement
+
+        parameters:
+        - distance: float
+        - direction: float
+
+        returns:
+        - x,y: float, float
+        """
+
+        x = np.cos(direction) * distance
+        y = np.sin(direction) * distance
+        
         return x,y
     
     def _advancer(self, pos0s, directions):
+        """
+        Function that advances the units simultaneously, each along a stretch.
+        It stops them whether they bump into each other or against the perimeter, 
+        then restart them into a new direction and progresses along the new stretch.
+        The function ends when each unit has reached the maximum allowed number of steps.
+        """
+
         outised_perimeter_unit0 = False
         outised_perimeter_unit1 = False
         
@@ -170,7 +249,18 @@ class Simulator(Base):
                             self.path_unit1.append(self.pos_unit1)
                             self.steps_unit1 += 1
     
-    def _new_stretch(self, first_call=True):
+    def _new_stretch(self, first_call=False):
+        """
+        Given the last position and direction of a unit, determine a new 
+        direction
+
+        returns:
+        - pos0s: list of list of two floats
+            the coordinates of the initial position of each unit
+        - directions: list of floats
+            new direction of each of unit
+        """
+
         pos0s = []
         directions = []
         for u in range(self.units):
@@ -185,18 +275,29 @@ class Simulator(Base):
                 pos0 = eval(f"self.path_unit{u}[-1]")
                 pos0s.append(pos0)
                 directions.append(direction)
+        
         return pos0s, directions
     
     def simulate(self, restart=False):
+        """
+        Function to simulate the motions of the two units in a single operation
+        Repeatedly calls the function _advancer until each unit has reached the 
+        maximum allowed number of steps.
+
+        parameter:
+        - restart: bool
+          variable to control if the units are restarted at from a previous operation
+        """
+
         if restart:
             self.stop_unit0 = False
             self.stop_unit1 = False
             self.steps_unit0 = 0
             self.steps_unit1 = 0
         
-        pos0s, directions = self._new_stretch()
+        pos0s, directions = self._new_stretch(True)
         
         #simulate until both units cover the max aloud distance
         while not self.stop_unit0 and not self.stop_unit1:
             self._advancer(pos0s, directions)
-            pos0s, directions = self._new_stretch(False)
+            pos0s, directions = self._new_stretch()

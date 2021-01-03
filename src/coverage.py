@@ -8,7 +8,12 @@ from shapely.geometry import Point
 from simulator import Simulator
 
 class Coverage(Simulator):
-    """docstring for Coverage"""
+    """
+    Class to initialise two units and run them through repeated operation 
+    cycles, keeping track of the area covered, stopping them when the 
+    total coverage exceed a threshold
+    """
+
     def __init__(self, **kwargs):
         kwargs['coverage'] = self.find_mown_area
         super(Coverage, self).__init__(**kwargs)
@@ -21,6 +26,11 @@ class Coverage(Simulator):
         self.build_lawn_grid()
     
     def build_lawn_grid(self):
+        """
+        Given a lawn area, build a fine grid representing it
+        which will determine the mowing progress
+        """
+
         xmin, ymin, xmax, ymax = self.region_polygon.bounds
 
         x_grid = np.arange(xmin, xmax+self.patch_size, self.patch_size)
@@ -43,8 +53,15 @@ class Coverage(Simulator):
 
         self.lawn_grid = region_grid[include_indices]
 
-
     def find_mown_area(self, position):
+        """
+        Determine the lawn patches covered by the present position of a unit.
+        This is obtained by calculating the distance of the patches centers 
+        from the unit's position and marking the ones that are closer than 
+        the unit's size. 
+        The marking is achieved by setting to True the component of an 
+        array representing the patches' coordinates.
+        """
         
         #boolean array for every lawn patch: True if mower passed, False otherwise
         mown_patches_grid = np.zeros(len(self.lawn_grid), dtype=bool)
@@ -62,8 +79,12 @@ class Coverage(Simulator):
 
         self.mown_grid = np.concatenate((self.mown_grid, temp_grid))
 
-
     def __call__(self, verbose=False):
+        """
+        Method to repeatedly initiate new operation cycles, until the ratio 
+        of the covered area to the total allowed (lawn) surface is larger than
+        a (default but user-definable) ratio.
+        """
         
         self.iteration = 0
         self.mown_area_ratio = 0
@@ -74,7 +95,7 @@ class Coverage(Simulator):
             if verbose:
                 print(f"starting iteration {self.iteration}")
                 print("simulate mowers")
-            
+
             self.simulate(restart=True)
 
             if first_execution:
