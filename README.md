@@ -20,7 +20,7 @@ might pass repeated times over the same patch of grass.
 - Determine the initial mowers' locations which minimise the number of operations to mow the entire lawn
 
 ### Repository organisation
-The achievement of the goal listed above proceeded in phases, for each of which there is a notebook associated
+The achievement of the goal listed above proceeds in stages, for each of which there is an associated notebook
 - `lawn_mower_path.ipynb`: definition of a region and its lawn; simulation of one mowing operation  
 - `lawn_mower_coverage.ipynb`: perform repeated operations, updating and recording the mown lawn after each  
 
